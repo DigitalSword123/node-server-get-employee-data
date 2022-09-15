@@ -5,7 +5,7 @@
     "main": "src/index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "build-employee-data": "node_modules/.bin/gulp --gulpfile gulpfile-build-module.js build --module-name employee-data --index-name index.js",
+        "build-employee-data": "node_modules/.bin/gulp --gulpfile gulpfile-build-module.js build --module-name get-node-employee-data --index-name index.js",
         "build-uber": "node_modules/.bin/gulp --gulpfile gulpfile.js build",
         "build": "npm run build-employee-data && npm run build-uber",
         "release": "node_modules/.bin/release-it --ci -VV"

@@ -85,10 +85,11 @@ else
     
     # npm login
     # npm publish --registry https://devopsamiya.jfrog.io/artifactory/api/npm/snapshots-npm/
-    jf rt ping
-    cd target
-    jf rt u "(*).zip" https://devopsamiya.jfrog.io/artifactory/api/npm/snapshots-npm/
+    # jf rt ping
+    # cd target
+    # jf rt u "(*).zip" https://devopsamiya.jfrog.io/artifactory/api/npm/snapshots-npm/
     echo "=================publish snapshot to Artifactory END====================="
+    echo "------------printing project folder files ------------------"
 
     ls -al
 
