@@ -29,15 +29,17 @@ var dbConfig = {
 
 // lambda entry point
 module.exports.handler = async function(ServiceRequest, context, callback) {
-    let response = null;
+    let response = {};
     let db = new postgresUno();
     try {
         console.log(FILE, " handler() - start:ServiceRequest" + JSON.stringify(ServiceRequest, null, 2));
         await db.connect(dbConfig);
         const req_name = ServiceRequest.body.name;
         console.log("req_name : " + req_name);
-        let dbQuery = `SELECT * FROM employeeTable WHERE name='${req_name}'`;
+        let dbQuery = `SELECT * FROM "employeeTable" WHERE name='${req_name}'`;
+        console.log("dbQuery : " + dbQuery)
         let result = await db.query(dbQuery);
+        console.log("result : " + JSON.stringify(result));
         if (result && result.rows && result.rows.length === 1) {
             response.name = result.rows[0].name;
             response.age = result.rows[0].age;

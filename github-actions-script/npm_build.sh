@@ -36,6 +36,8 @@ echo $GITHUB_REF_NAME
 if [ $GITHUB_REF_NAME == "main" ]
 then
     sudo mkdir /.ssh && ls -alrt /.ssh
+    git config --global user.name "Amiya Rana"
+    git config --global user.email "ranaamiya70@gmail.com"
     # sudo cat ./ssh_keys/id_ed25519 >> ls -alrt /.ssh/id_ed25519
     # sudo cat ./ssh_keys/known_hosts >> ls -alrt /.ssh/known_hosts
     sudo cp ./ssh_keys/id_ed25519 /.ssh/id_ed25519 

@@ -1,11 +1,11 @@
 module.exports.buildSuccessResponse = function(respons) {
     return {
         "success": "true",
-        "message": "employee data added to table"
+        "message": "employee data fetch sucess"
     };
 }
 
-module.exports.buildFailureResponse = function(respons) {
+module.exports.buildFailureResponse = function(ServiceRequest) {
     return {
         "success": "false",
         "message": "errror occured in getting the data from database"
