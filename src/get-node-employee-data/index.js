@@ -35,7 +35,7 @@ module.exports.handler = async function(ServiceRequest, context, callback) {
         console.log(FILE, " handler() - start:ServiceRequest" + JSON.stringify(ServiceRequest, null, 2));
         await db.connect(dbConfig);
         const req_name = ServiceRequest.body.name;
-
+        console.log("req_name : " + req_name);
         let dbQuery = `SELECT * FROM "employeeTable" WHERE name=${req_name}`;
         let result = await db.query(dbQuery);
         if (result && result.rows && result.rows.length === 1) {

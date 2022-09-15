@@ -96,28 +96,28 @@ resource "aws_cloudwatch_log_group" "example" {
   retention_in_days = 14
 }
 
-# See also the following AWS managed policy: AWSLambdaBasicExecutionRole
-resource "aws_iam_policy" "lambda_logging_employee" {
-  name = "lambda_logging_employee"
-  path = "/"
-  description = "IAM policy for logging from a lambda"
+# # See also the following AWS managed policy: AWSLambdaBasicExecutionRole
+# resource "aws_iam_policy" "lambda_logging_employee" {
+#   name = "lambda_logging_employee"
+#   path = "/"
+#   description = "IAM policy for logging from a lambda"
 
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ],
-      "Resource": "arn:aws:logs:*:*:*",
-      "Effect": "Allow"
-    }
-  ]
-}
-EOF
-}
+#   policy = <<EOF
+# {
+#   "Version": "2012-10-17",
+#   "Statement": [
+#     {
+#       "Action": [
+#         "logs:CreateLogStream",
+#         "logs:PutLogEvents"
+#       ],
+#       "Resource": "arn:aws:logs:*:*:*",
+#       "Effect": "Allow"
+#     }
+#   ]
+# }
+# EOF
+# }
 
 # resource "aws_iam_role_policy_attachment" "lambda_logs" {
 #   role = data.aws_iam_role.iam_for_lambda_node.name
