@@ -14,7 +14,7 @@ const postgresUno = require('postgres-uno');
 
 /** 
  * Entry point of lambda function
- * @param {object} event - 
+ * @param {object} ServiceRequest - 
  * @param context 
  * @param callback
  */
@@ -28,21 +28,26 @@ var dbConfig = {
 };
 
 // lambda entry point
-module.exports.handler = async function(event, context, callback) {
+module.exports.handler = async function(ServiceRequest, context, callback) {
     let response = null;
     let db = new postgresUno();
     try {
-        console.log(FILE, " handler() - start:event" + JSON.stringify(event, null, 2));
+        console.log(FILE, " handler() - start:ServiceRequest" + JSON.stringify(ServiceRequest, null, 2));
         await db.connect(dbConfig);
-        const name = event.body.name;
-        const age = event.body.age;
-        const country = event.body.country;
-        const wage = event.body.wage;
-        const position = event.body.position;
+        const req_name = ServiceRequest.body.name;
 
-        let dbQuery = `INSERT INTO "employeeTable"(name, age, country, position, wage) VALUES ('${name}','${age}','${country}','${position}','${wage}')`;
+        let dbQuery = `SELECT * FROM "employeeTable" WHERE name=${req_name}`;
         let result = await db.query(dbQuery);
-        response = utils.buildSuccessResponse(result);
+        if (result && result.rows && result.rows.length === 1) {
+            response.name = result.rows[0].name;
+            response.age = result.rows[0].age;
+            response.country = result.rows[0].country;
+            response.wage = result.rows[0].wage;
+            response.position = result.rows[0].position;
+        } else {
+            response = utils.buildDataNotFound(ServiceRequest)
+        }
+
     } catch (err) {
         console.log("error happended" + err);
         response = utils.buildFailureResponse(err);

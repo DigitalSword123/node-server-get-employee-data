@@ -11,3 +11,11 @@ module.exports.buildFailureResponse = function(respons) {
         "message": "errror occured in during employee data added to table"
     };
 }
+
+module.exports.buildDataNotFound = function(ServiceRequest) {
+    let name = ServiceRequest.name;
+    return {
+        "success": "false",
+        "message": `no data found for ${name}`
+    };
+}

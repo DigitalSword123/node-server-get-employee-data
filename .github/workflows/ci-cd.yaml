@@ -12,7 +12,7 @@ on:
       - 'bugfix/**'
 
 env:
-  MODULE_NAME: employee-data
+  MODULE_NAME: get-node-employee-data
 
 jobs:
   init-before:
@@ -101,7 +101,7 @@ jobs:
         with:
           name: build_output_1
           path: |
-            dist-employee-data.zip
+            dist-get-node-employee-data.zip
             build.env 
 
 
@@ -133,7 +133,7 @@ jobs:
         with:
           name: build_output_1
           path: |
-            dist-employee-data.zip
+            dist-get-node-employee-data.zip
             build.env 
 
       # - name: jfrog upload

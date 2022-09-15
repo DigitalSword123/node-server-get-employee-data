@@ -9,7 +9,7 @@ const cors = require("cors");
 app.use(cors());
 app.use(express.json());
 const FILE = "src/index.js";
-const utils = require('./utils');
+const utils = require('./lib/utils');
 
 // https://node-server-employee-data-aws.herokuapp.com/
 

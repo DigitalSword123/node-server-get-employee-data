@@ -1,5 +1,5 @@
 {
-    "name": "node-server-employee-data",
+    "name": "get-node-employee-data",
     "version": "1.0.0-SNAPSHOT",
     "description": "employee data repository",
     "main": "src/index.js",
