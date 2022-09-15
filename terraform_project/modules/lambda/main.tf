@@ -33,32 +33,35 @@ locals {
 
 # https://stackoverflow.com/questions/70232248/not-able-to-create-zip-file-for-aws-lambda-fx-in-gitlab-through-terraform
 
-resource "aws_iam_role" "iam_for_lambda_node" {
+# resource "aws_iam_role" "iam_for_lambda_node" {
+#   name = "iam_for_lambda_node_${lower(var.environment)}"
+
+#   assume_role_policy = <<-POLICY
+# {
+#   "Version": "2012-10-17",
+#   "Statement": [
+#     {
+#       "Action": "sts:AssumeRole",
+#       "Principal": {
+#         "Service": "lambda.amazonaws.com"
+#       },
+#       "Effect": "Allow",
+#       "Sid": ""
+#     }
+#   ]
+# }
+# POLICY
+# }
+
+data "aws_iam_role" "iam_for_lambda_node" {
   name = "iam_for_lambda_node_${lower(var.environment)}"
-
-  assume_role_policy = <<-POLICY
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
 }
-POLICY
-}
-
 
 resource "aws_lambda_function" "lambda_employee_node_server" {
   function_name    = var.function_name
   filename         = var.filename
   source_code_hash = filebase64sha256(var.filename)
-  role             = aws_iam_role.iam_for_lambda_node.arn
+  role             = data.aws_iam_role.iam_for_lambda_node.arn
   handler          = "index.handler"
   runtime          = "nodejs14.x"
   memory_size      = "128"
@@ -117,6 +120,6 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_logs" {
-  role = aws_iam_role.iam_for_lambda_node.name
+  role = data.aws_iam_role.iam_for_lambda_node.name
   policy_arn = "${aws_iam_policy.lambda_logging_employee.arn}"
 }
