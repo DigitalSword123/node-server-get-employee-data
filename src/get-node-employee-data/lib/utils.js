@@ -8,7 +8,7 @@ module.exports.buildSuccessResponse = function(respons) {
 module.exports.buildFailureResponse = function(respons) {
     return {
         "success": "false",
-        "message": "errror occured in during employee data added to table"
+        "message": "errror occured in getting the data from database"
     };
 }
 

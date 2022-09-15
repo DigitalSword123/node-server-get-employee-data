@@ -119,7 +119,7 @@ resource "aws_iam_policy" "lambda_logging_employee" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_logs" {
-  role = data.aws_iam_role.iam_for_lambda_node.name
-  policy_arn = "${aws_iam_policy.lambda_logging_employee.arn}"
-}
+# resource "aws_iam_role_policy_attachment" "lambda_logs" {
+#   role = data.aws_iam_role.iam_for_lambda_node.name
+#   policy_arn = "${aws_iam_policy.lambda_logging_employee.arn}"
+# }
