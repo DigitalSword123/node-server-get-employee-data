@@ -1,0 +1,252 @@
+name: node server employee data CI/CD pipeline
+
+on:
+  push:
+    branches: 
+      - 'feature/**'
+      - main
+  pull_request:
+    branches:
+      - 'feature/**'
+      - 'hotfix/**'
+      - 'bugfix/**'
+
+env:
+  MODULE_NAME: employee-data
+
+jobs:
+  init-before:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run init-before script
+        working-directory: /
+        run: |
+          echo "starting init-before stage"
+          echo $(pwd)
+          echo "--------printing current branch name-------------"
+          echo $GITHUB_REF_NAME
+          sudo mkdir .aws
+          sudo mkdir .jfrog
+          sudo mkdir .m2
+          echo "**************printing files in home directory***************"
+          ls -al
+          sudo pip install --upgrade pip
+          sudo pip install semver # https://python-semver.readthedocs.io/en/2.9.0/index.html
+          if [ "$DEBUG" = true ] ; then
+            ls -alrt /.aws && ls -alrt ~ && ls -alrtr /.jfrog/ && ls -alrt /.m2
+          fi
+        env: 
+          DEBUG : true
+
+      # - name: Upload config files as artifact
+      #   uses: actions/upload-artifact@v1
+      #   with:
+      #     name: config_files
+      #     path: |
+      #       /.aws
+  
+  init:
+    needs: init-before
+    runs-on: ubuntu-latest
+    outputs:
+      VARIABLE_FILE: ${{ steps.init-output-variable-file.outputs.output_file }}
+    steps:
+      - uses: actions/checkout@v3
+
+      # - name: Download artifact config_files from init stage
+      #   uses: actions/download-artifact@v1
+      #   with:
+      #     name: config_files
+
+      - name: Run init stage
+        working-directory: .
+        run: |
+          bash ./github-actions-script/init-script.sh
+        env:
+          VARIABLE_FILE: build.env
+
+      - name: Upload file build.env as an artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: variable_file_init
+          path: build.env
+
+  npm-build-branch:
+    needs: init 
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+    # if: ${{ github.ref_name }} != 'main'
+    if: github.ref != 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download artifact variable_file_init from init stage
+        uses: actions/download-artifact@v1
+        with:
+          name: variable_file_init
+
+      - name: Run npm-build-branch stage 
+        working-directory: .
+        run: |
+          bash ./github-actions-script/npm_build.sh
+        env:
+          VARIABLE_FILE: build.env
+
+      - name: Upload build.env and dist folder output as artifact to deploy stage
+        uses: actions/upload-artifact@v3
+        with:
+          name: build_output_1
+          path: |
+            dist-employee-data.zip
+            build.env 
+
+
+  npm-build-main:
+    needs: init 
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
+    # if: ${{ github.ref_name }} == 'main'
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download artifact variable_file_init from init stage
+        uses: actions/download-artifact@v1
+        with:
+          name: variable_file_init
+
+      - name: Run npm-build-main stage 
+        working-directory: .
+        run: |
+          bash ./github-actions-script/npm_build.sh
+        env:
+          VARIABLE_FILE: build.env
+
+      - name: Upload build.env and dist folder output as artifact to deploy stage
+        uses: actions/upload-artifact@v3
+        with:
+          name: build_output_1
+          path: |
+            dist-employee-data.zip
+            build.env 
+
+      # - name: jfrog upload
+      #   uses: jfrog/setup-jfrog-cli@v2
+      # - run: |
+      #     # sudo mkdir /.jfrog
+      #     # sudo cp ./jfrog_keys/jfrog-cli.conf /.jfrog/jfrog-cli.conf
+      #     jf --version
+      #     jf rt ping --url=https://devopsamiya.jfrog.io/artifactory/api/npm/snapshots-npm/
+      #     cp variable_file_init/${VARIABLE_FILE} ../${VARIABLE_FILE}
+      #     source $VARIABLE_FILE
+      #     cd target
+      #     ls -al
+      #     jf rt u "(*).zip" --url https://devopsamiya.jfrog.io/artifactory/api/npm/snapshots-npm/
+      #   env: 
+      #     VARIABLE_FILE: build.env
+      #     JF_USER: "ranaamiya70@gmail.com"
+      #     JF_PASSWORD: "amiya1234"
+      #     JF_URL: "https://devopsamiya.jfrog.io/"
+
+
+  # test: 
+  #   needs: build
+
+  deploy_dev_auto:
+    needs: npm-build-branch
+    name: deploy_dev_auto stage
+    runs-on: ubuntu-latest
+    # if: ${{ github.ref_name }} != 'main'
+    if: github.ref != 'refs/heads/main'
+    steps:
+
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Download artifact build_output from build stage
+        uses: actions/download-artifact@v1
+        with:
+          name: build_output_1
+
+      - name: Terraform deployement for dev_auto environment
+        uses: hashicorp/terraform-github-actions/init@v0.4.0
+      - run: |
+          terraform -v
+          bash ./github-actions-script/deploy_script.sh
+        env:
+          # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TF_ACTION_WORKING_DIR: .
+          AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_KEY }}
+          VARIABLE_FILE: build.env
+          DEPLOY_ENVIRONMENT: dev
+
+  deploy_dev_manual:
+    needs: npm-build-main
+    name: deploy_dev_manual stage
+    runs-on: ubuntu-latest
+    # if: ${{ github.ref_name }} == 'main'
+    if: github.ref == 'refs/heads/main'
+    steps:
+
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Download artifact build_output from build stage
+        uses: actions/download-artifact@v1
+        with:
+          name: build_output_1
+
+      - name: Terraform deployement for dev_auto environment
+        uses: hashicorp/terraform-github-actions/init@v0.4.0
+      - run: |
+          terraform -v
+          bash ./github-actions-script/deploy_script.sh
+        env:
+          # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TF_ACTION_WORKING_DIR: ./terraform_project
+          AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_KEY }}
+          VARIABLE_FILE: build.env
+          DEPLOY_ENVIRONMENT: dev
+
+  deploy_qa:
+    needs: [npm-build-main, deploy_dev_manual]
+    name: deploy_qa stage
+    runs-on: ubuntu-latest
+    environment:
+      name: deploy_qa_manual
+    if: ${{ github.ref_name }} == 'main'
+    steps:
+
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Download artifact build_output from build stage
+        uses: actions/download-artifact@v1
+        with:
+          name: build_output_1
+
+      - name: Terraform deployement for qa environment
+        uses: hashicorp/terraform-github-actions/init@v0.4.0
+      - run: |
+          terraform -v
+          bash ./github-actions-script/deploy_script.sh
+        env:
+          # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TF_ACTION_WORKING_DIR: .
+          AWS_ACCESS_KEY_ID:  ${{ secrets.AWS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY:  ${{ secrets.AWS_SECRET_KEY }}
+          VARIABLE_FILE: build.env
+          DEPLOY_ENVIRONMENT: qa
+
+  # deploy_uat: same as of deploy_qa stage
+  #   needs: deploy_qa
+  # deploy_prod:
+  #   needs: deploy_uat
