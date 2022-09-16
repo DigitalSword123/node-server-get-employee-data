@@ -45,7 +45,7 @@ module.exports.handler = async function(ServiceRequest, context, callback) {
         let dbQuery = `SELECT * FROM "employeeTable" WHERE name='${req_name}'`;
         console.log("dbQuery : " + dbQuery)
         let result = await db.query(dbQuery);
-        console.log("result : " + JSON.stringify(result));
+        // console.log("result : " + JSON.stringify(result));
         if (result && result.rows && result.rows.length === 1) {
             response.name = result.rows[0].name;
             response.age = result.rows[0].age;
@@ -54,10 +54,10 @@ module.exports.handler = async function(ServiceRequest, context, callback) {
             response.position = result.rows[0].position;
             var params = {
                 Entries: [{
-                    Detail: response,
+                    Detail: JSON.stringify(response),
                     DetailType: 'appRequestSubmitted',
                     Resources: [
-                        'arn:aws:events:ap-south-1:877760304415:rule/employee-data-event-bus/employee-data',
+                        'arn:aws:events:ap-south-1:877760304415:event-bus/default',
                     ],
                     Source: 'arn:aws:lambda:ap-south-1:877760304415:function:get-node-employee-data-DEV'
                 }]
