@@ -14,3 +14,11 @@
         "name": "Amiya Rana"
     }
 }
+
+{
+    "name": "<required>",
+    "age": "<required>",
+    "country": "<required>",
+    "wage": "<required>",
+    "position": "<required>"
+}

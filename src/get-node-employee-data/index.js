@@ -9,6 +9,12 @@
 const FILE = "src/index.js";
 const utils = require('./lib/utils');
 const postgresUno = require('postgres-uno');
+// Import required AWS SDK clients and commands for Node.js.
+var AWS = require('aws-sdk');
+AWS.config.update({ region: 'ap-south-1' });
+
+// Create CloudWatchEvents service object
+var ebevents = new AWS.EventBridge({ apiVersion: '2015-10-07' });
 
 // https://node-server-employee-data-aws.herokuapp.com/
 
@@ -46,6 +52,23 @@ module.exports.handler = async function(ServiceRequest, context, callback) {
             response.country = result.rows[0].country;
             response.wage = result.rows[0].wage;
             response.position = result.rows[0].position;
+            var params = {
+                Entries: [{
+                    Detail: response,
+                    DetailType: 'appRequestSubmitted',
+                    Resources: [
+                        'arn:aws:events:ap-south-1:877760304415:rule/employee-data-event-bus/employee-data',
+                    ],
+                    Source: 'arn:aws:lambda:ap-south-1:877760304415:function:get-node-employee-data-DEV'
+                }]
+            };
+            ebevents.putEvents(params, function(err, data) {
+                if (err) {
+                    console.log("Error in sending to event bus", err);
+                } else {
+                    console.log("Success", data.Entries);
+                }
+            });
         } else {
             response = utils.buildDataNotFound(ServiceRequest)
         }
