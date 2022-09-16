@@ -79,7 +79,7 @@ const copyLibFiles = () => {
 //             cb(err)
 //         }
 
-//     ));
+//     )); 
 // };
 
 // this function will install only dependencies not devDependencies present in local package.json file
