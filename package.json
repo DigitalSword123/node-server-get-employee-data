@@ -74,6 +74,6 @@
         "moment": "^2.29.4",
         "dotenv": "^8.2.0",
         "postgres-uno": "^2.1.0",
-        "aws-sdk": "^2.1217.0"
+        "@aws-sdk/client-eventbridge": "^3.171.0"
     }
 }
