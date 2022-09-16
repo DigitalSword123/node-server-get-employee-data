@@ -15,7 +15,7 @@ const postgresUno = require('postgres-uno');
 
 const { EventBridgeClient, ActivateEventSourceCommand } = require("@aws-sdk/client-eventbridge");
 // a client can be shared by different commands.
-const client = new EventBridgeClient({ region: "REGION" });
+const client = new EventBridgeClient({ region: "ap-south-1" });
 
 
 // Create CloudWatchEvents service object
