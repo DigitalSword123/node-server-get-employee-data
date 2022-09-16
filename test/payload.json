@@ -22,3 +22,107 @@
     "wage": "<required>",
     "position": "<required>"
 }
+
+{
+    Entries: [{
+        "Time": new Date(),
+        "Source": 'Lambda Publish',
+        "Detail": JSON.stringify(response),
+        "DetailType": 'Event from get-employee-data',
+        "Resources": [
+
+        ],
+        "EventBusName": 'arn:aws:events:ap-south-1:877760304415:event-bus/default',
+        "TraceHeader": 'testDemo'
+    }]
+}
+
+
+{
+    Entries: [{
+        Detail: {
+            name: "String",
+            age: "String",
+            country: "String",
+            wage: "String",
+            position: "String"
+        },
+        DetailType: 'transaction',
+        EventBusName: 'default',
+        Resources: [],
+        Source: 'my.getEmployeeApp',
+        Time: new Date || 'Wed Dec 31 1969 16:00:00 GMT-0800 (PST)' || 123456789
+    }]
+}
+
+
+{
+    "DetailType": "transaction",
+    "source": "aws.lambda.com",
+    "time": "2019-11-21T01:22:33Z",
+    "EventBusName": "default",
+    "resources": [],
+    "Detail": {
+        "name": "<required>",
+        "age": "<required>",
+        "country": "<required>",
+        "wage": "<required>",
+        "position": "<required>"
+    }
+}
+
+
+{
+    "detail-type": "getting data from employee",
+    "source": "aws.lambda.com",
+    "time": "2019-01-16T18:16:01Z",
+    "region": "ap-south-1",
+    "resources": [],
+    "detail": {
+        "name": "<required>",
+        "age": "<required>",
+        "country": "<required>",
+        "wage": "<required>",
+        "position": "<required>"
+    }
+}
+
+{
+    "version": "2.0",
+    "routeKey": "POST /get-node-employee-data/getEmployeeData",
+    "rawPath": "/get-node-employee-data/getEmployeeData",
+    "rawQueryString": "",
+    "headers": {
+        "accept": "*/*",
+        "accept-encoding": "gzip, deflate, br",
+        "content-length": "31",
+        "content-type": "application/json",
+        "host": "1e4ejis8va.execute-api.ap-south-1.amazonaws.com",
+        "postman-token": "a35a1178-d642-439e-bc11-9b10b23c7f41",
+        "user-agent": "PostmanRuntime/7.28.4",
+        "x-amzn-trace-id": "Root=1-632420d4-2e786a8044e80d5b7a39da8a",
+        "x-forwarded-for": "157.41.185.56",
+        "x-forwarded-port": "443",
+        "x-forwarded-proto": "https"
+    },
+    "requestContext": {
+        "accountId": "877760304415",
+        "apiId": "1e4ejis8va",
+        "domainName": "1e4ejis8va.execute-api.ap-south-1.amazonaws.com",
+        "domainPrefix": "1e4ejis8va",
+        "http": {
+            "method": "POST",
+            "path": "/get-node-employee-data/getEmployeeData",
+            "protocol": "HTTP/1.1",
+            "sourceIp": "157.41.185.56",
+            "userAgent": "PostmanRuntime/7.28.4"
+        },
+        "requestId": "YioRRi3KBcwEJxQ=",
+        "routeKey": "POST /get-node-employee-data/getEmployeeData",
+        "stage": "$default",
+        "time": "16/Sep/2022:07:08:04 +0000",
+        "timeEpoch": 1663312084775
+    },
+    "body": "{\r\n    \"name\": \"Amiya Rana\" \r\n}",
+    "isBase64Encoded": false
+}

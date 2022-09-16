@@ -11,10 +11,10 @@ const utils = require('./lib/utils');
 const postgresUno = require('postgres-uno');
 // Import required AWS SDK clients and commands for Node.js.
 var AWS = require('aws-sdk');
-AWS.config.update({ region: 'ap-south-1' });
+AWS.config.region = 'ap-south-1';
 
 // Create CloudWatchEvents service object
-var ebevents = new AWS.EventBridge({ apiVersion: '2015-10-07' });
+const eventbridge = new AWS.EventBridge();
 
 // https://node-server-employee-data-aws.herokuapp.com/
 
@@ -40,8 +40,11 @@ module.exports.handler = async function(ServiceRequest, context, callback) {
     try {
         console.log(FILE, " handler() - start:ServiceRequest" + JSON.stringify(ServiceRequest, null, 2));
         await db.connect(dbConfig);
-        const req_name = ServiceRequest.body.name;
+
+        let request = JSON.parse(ServiceRequest.body);
+        var req_name = request.name;
         console.log("req_name : " + req_name);
+
         let dbQuery = `SELECT * FROM "employeeTable" WHERE name='${req_name}'`;
         console.log("dbQuery : " + dbQuery)
         let result = await db.query(dbQuery);
@@ -52,23 +55,26 @@ module.exports.handler = async function(ServiceRequest, context, callback) {
             response.country = result.rows[0].country;
             response.wage = result.rows[0].wage;
             response.position = result.rows[0].position;
+            let date_ob = new Date();
             var params = {
-                Entries: [{
-                    Detail: JSON.stringify(response),
-                    DetailType: 'appRequestSubmitted',
-                    Resources: [
-                        'arn:aws:events:ap-south-1:877760304415:event-bus/default',
-                    ],
-                    Source: 'arn:aws:lambda:ap-south-1:877760304415:function:get-node-employee-data-DEV'
-                }]
+                Entries: [ /* required */ {
+                        "DetailType": "transaction",
+                        "source": "aws.lambda.com",
+                        "time": "2019-11-21T01:22:33Z",
+                        "EventBusName": "default",
+                        "resources": [],
+                        Time: new Date || 'Wed Dec 31 1969 16:00:00 GMT-0800 (PST)' || 123456789,
+                        "Detail": JSON.stringify(response)
+                    }
+                    /* more items */
+                ]
             };
-            ebevents.putEvents(params, function(err, data) {
-                if (err) {
-                    console.log("Error in sending to event bus", err);
-                } else {
-                    console.log("Success", data.Entries);
-                }
+            console.log("params : " + JSON.stringify(params, null, 2))
+            var event_bridge_result = await eventbridge.putEvents(params, function(err, data) {
+                if (err) console.log(err, err.stack); // an error occurred
+                else console.log("success " + data); // successful response
             });
+            console.log("event_bridge_resuslt : " + JSON.stringify(event_bridge_result, getCircularReplacer()));
         } else {
             response = utils.buildDataNotFound(ServiceRequest)
         }
@@ -78,4 +84,18 @@ module.exports.handler = async function(ServiceRequest, context, callback) {
         response = utils.buildFailureResponse(err);
     }
     return response;
+};
+
+
+const getCircularReplacer = () => {
+    const seen = new WeakSet();
+    return (key, value) => {
+        if (typeof value === 'object' && value !== null) {
+            if (seen.has(value)) {
+                return;
+            }
+            seen.add(value);
+        }
+        return value;
+    };
 };
