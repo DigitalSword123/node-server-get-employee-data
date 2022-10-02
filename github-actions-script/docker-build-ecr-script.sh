@@ -2,6 +2,10 @@
 
 # docker build . -t aws/node-web-get-employee-app
 
+# CONTAINER ID        IMAGE                           COMMAND                  C
+# ATED             STATUS                      PORTS               NAMES
+# 49dc20b3071b        aws/node-web-get-employee-app   "docker-entrypoint.s"   17
+# econds ago      Exited (0) 13 seconds ago                       practical_newt
 
 echo $(pwd)
 imageTag=$version
